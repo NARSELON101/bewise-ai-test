@@ -1,0 +1,9 @@
+pydantic
+fastapi
+starlette
+requests
+uvicorn
+loggers[all]
+sqlalchemy
+kafka-python
+psycopg2
