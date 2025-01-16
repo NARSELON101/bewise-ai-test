@@ -1,30 +1,40 @@
-from sqlalchemy.orm import Session
-
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.app.dto import ApplicationDTO
 from src.app.models import Application
 from src.app.utils import paginate
 
 
 class ApplicationRepository:
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self._db = db
 
-    def add(self, application):
+    async def add(self, application):
         self._db.add(application)
-        self._db.commit()
         return application.id
 
-    def delete(self, application: ApplicationDTO):
+    async def commit(self):
+        await self._db.commit()
+
+    async def rollback(self):
+        await self._db.rollback()
+
+    async def delete(self, application: ApplicationDTO):
         pass
 
-    def update(self, application: ApplicationDTO):
+    async def update(self, application: ApplicationDTO):
         pass
 
-    def get_list(self, page, size, filters: dict = None):
-        applications = self._db.query(Application)
+    async def get_list(self, page, size, filters: dict = None):
+        statement = select(Application)
+
         if filters:
-            applications = applications.filter_by(**filters)
-        return [ApplicationDTO.from_orm(app) for app in paginate(applications, page=page, size=size)]
+            statement = statement.filter_by(**filters)
 
-    def get(self, application_id):
+        statement = paginate(statement, page=page, size=size)
+
+        applications = await self._db.execute(statement)
+        return [ApplicationDTO.from_orm(app) for app in applications.scalars()]
+
+    async def get(self, application_id):
         pass
