@@ -8,3 +8,6 @@ sqlalchemy
 aiokafka
 confluent_kafka
 asyncpg
+pytest
+httpx
+pytest-asyncio
