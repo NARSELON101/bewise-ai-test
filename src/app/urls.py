@@ -2,6 +2,7 @@ from confluent_kafka import KafkaException
 from fastapi import APIRouter, Response, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.app.application_service import ApplicationService
+from src.app.dto import ApplicationDTO
 from src.app.models import Application
 
 from src.postgresql.database import get_postgres_db
@@ -16,7 +17,8 @@ def get_application_service(db: AsyncSession = Depends(get_postgres_db)):
 @router.get('/applications')
 async def get_applications(request: Request,
                            user_name: str = '',
-                           page: int = Query(default=1, gt=0), size: int = Query(default=10, gt=0)):
+                           page: int = Query(default=1, gt=0),
+                           size: int = Query(default=10, gt=0)) -> list[ApplicationDTO]:
     """ Возвращает список заметок на текущей странице, с возможностью фильтрации по имени пользователя
 
         Параметры:
